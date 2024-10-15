@@ -11,6 +11,18 @@ export class BankingSystemRepository {
     return account;
   }
 
+  static async insufficientCheck(accountID, amount) {
+    const query = await client.query(
+      `SELECT balance FROM accounts WHERE id = $1`,
+      [accountID],
+    );
+    const balance = query.rows[0].balance;
+
+    const insufficient = amount > balance ? true : false;
+
+    return insufficient;
+  }
+
   static async getBalance(accountID) {
     const query = await client.query(
       `SELECT balance FROM accounts WHERE id = $1`,
@@ -21,37 +33,15 @@ export class BankingSystemRepository {
     return balance;
   }
 
-  static async deposit(senderID, receiverID, amount) {
-    console.log({ senderID, receiverID });
-    const senderBalance = await client.query(
-      `SELECT balance FROM accounts WHERE id = $1`, // Fixed closing parenthesis
-      [senderID],
+  static async updateBalance(accountID, newBalance) {
+    const query = await client.query(
+      'UPDATE accounts SET balance = $1 WHERE id = $2 RETURNING *',
+      [newBalance, accountID],
     );
 
-    console.log('====================================');
-    console.log('SENDER');
-    console.log(senderBalance); // Access the actual row data
-    console.log('====================================');
+    const senderNewBalance = query.rows[0].balance;
 
-    const receiverBalance = await client.query(
-      `SELECT balance FROM accounts WHERE id = $1`, // Fixed closing parenthesis
-      [receiverID],
-    );
-
-    console.log('====================================');
-    console.log('RECEIVER');
-    console.log(receiverBalance); // Access the actual row data
-    console.log('====================================');
-
-    return 'deposit';
-  }
-
-  static async withdrawal() {
-    return 'withdrawal';
-  }
-
-  static async transfer() {
-    return 'transfer';
+    return senderNewBalance;
   }
 
   static async log() {

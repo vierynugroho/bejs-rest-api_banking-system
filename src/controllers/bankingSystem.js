@@ -1,4 +1,3 @@
-import { BankingSystemRepository } from '../repositories/bankingSystem.js';
 import { BankingSystemService } from '../services/bankingSystem.js';
 import { ErrorHandler } from '../utils/errorHandler.js';
 import { formatRupiah } from '../utils/formatRupiah.js';
@@ -7,12 +6,9 @@ export class BankingSystemController {
   static async getBalance(req, res, next) {
     try {
       const accountID = req.params.id;
-      const account = await BankingSystemRepository.getAccount(accountID);
 
-      if (!account) {
-        return next(
-          new ErrorHandler(`account with ID: ${accountID} is not found`, 404),
-        );
+      if (!accountID) {
+        return next(new ErrorHandler(`account ID is required`, 400));
       }
 
       const balance = await formatRupiah(
@@ -32,25 +28,28 @@ export class BankingSystemController {
 
   static async deposit(req, res, next) {
     try {
-      const accountID = req.params.id;
-      const account = await BankingSystemRepository.getAccount(accountID);
+      const account = req.params.id;
+      const amount = parseFloat(req.query.amount);
 
       if (!account) {
-        return next(
-          new ErrorHandler(`account with ID: ${accountID} is not found`, 404),
-        );
+        return next(new ErrorHandler(`sender ID is required`, 400));
+      }
+
+      if (!amount) {
+        return next(new ErrorHandler(`amount is required`, 400));
       }
 
       const deposit = await BankingSystemService.deposit(
-        req.query.senderID,
-        req.query.receiverID,
-        req.query.amount,
+        senderID,
+        receiverID,
+        amount,
       );
+
       res.json({
         status: true,
         statusCode: 200,
         message: 'deposit successfully',
-        data: deposit,
+        data: { currenBalance: deposit },
       });
     } catch (error) {
       next(new ErrorHandler(error.message, error.statusCode));
@@ -68,13 +67,40 @@ export class BankingSystemController {
   }
 
   static async transfer(req, res, next) {
-    const transfer = await BankingSystemService.transfer();
-    res.json({
-      status: true,
-      statusCode: 200,
-      message: 'transfer successfully',
-      data: transfer,
-    });
+    try {
+      const senderID = req.query.senderID;
+      const receiverID = req.query.receiverID;
+      const amount = parseFloat(req.query.amount);
+
+      console.log(senderID, receiverID, amount);
+
+      if (!senderID) {
+        return next(new ErrorHandler(`sender ID is required`, 400));
+      }
+
+      if (!receiverID) {
+        return next(new ErrorHandler(`receiver ID is required`, 400));
+      }
+
+      if (!amount) {
+        return next(new ErrorHandler(`amount is required`, 400));
+      }
+
+      const transfer = await BankingSystemService.transfer(
+        senderID,
+        receiverID,
+        amount,
+      );
+
+      res.json({
+        status: true,
+        statusCode: 200,
+        message: 'deposit successfully',
+        data: transfer,
+      });
+    } catch (error) {
+      next(new ErrorHandler(error.message, error.statusCode));
+    }
   }
 
   static async log(req, res, next) {

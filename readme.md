@@ -25,7 +25,7 @@
 
 ### KM x Binar Academy Batch 7
 
-|           |
-| --------- |
-| **Notes** |
-| Learn     |
+|                                        |
+| -------------------------------------- |
+| **Notes**                              |
+| Thunder Client -> using folder db_rest |

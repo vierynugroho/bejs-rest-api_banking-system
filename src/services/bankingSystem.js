@@ -21,15 +21,6 @@ export class BankingSystemService {
       throw new ErrorHandler(`account with ID: ${senderID} is not found`, 404);
     }
 
-    const insufficient = await BankingSystemRepository.insufficientCheck(
-      accountID,
-      amount,
-    );
-
-    if (insufficient) {
-      throw new ErrorHandler(`account remaining balance is insufficient`, 400);
-    }
-
     const accountBalance = await BankingSystemRepository.getBalance(accountID);
 
     const newAccountBalance = parseFloat(accountBalance) + amount;

@@ -8,14 +8,6 @@ import errorMiddleware from './middlewares/error.js';
 
 const app = express();
 
-// const logMiddleware = (req, res, next) => {
-//   console.log(
-//     `Request Method: ${req.method} - URL: ${req.originalUrl} - Timestamp: ${new Date().toLocaleDateString()}`,
-//   );
-
-//   next();
-// };
-
 app.use(
   cors({
     origin: '*',
@@ -32,14 +24,12 @@ app.use(logger(logger_format.MORGAN_FORMAT));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// app.use(logMiddleware);
-
 app.use(router);
 
 // error response handler
 app.use(errorMiddleware);
 
-//* 404 Response Handler
+// 404 Response Handler
 app.use((req, res) => {
   const url = req.url;
   const method = req.method;

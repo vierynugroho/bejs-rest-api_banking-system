@@ -119,12 +119,23 @@ export class BankingSystemController {
   }
 
   static async log(req, res, next) {
-    const log = await BankingSystemService.log();
-    res.json({
-      status: true,
-      statusCode: 200,
-      message: 'log successfully',
-      data: log,
-    });
+    try {
+      const accountID = req.params.id;
+
+      if (!accountID) {
+        return next(new ErrorHandler(`sender ID is required`, 400));
+      }
+
+      const logTrx = await BankingSystemService.log(accountID);
+
+      res.json({
+        status: true,
+        statusCode: 200,
+        message: 'log transaction successfully',
+        data: logTrx,
+      });
+    } catch (error) {
+      next(new ErrorHandler(error.message, error.statusCode));
+    }
   }
 }

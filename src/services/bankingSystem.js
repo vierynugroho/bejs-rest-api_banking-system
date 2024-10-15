@@ -130,8 +130,15 @@ export class BankingSystemService {
     return trx;
   }
 
-  static async log() {
-    const log = await BankingSystemRepository.log();
+  static async log(accountID) {
+    const account = await BankingSystemRepository.getAccount(accountID);
+
+    if (!account) {
+      throw new ErrorHandler(`account with ID: ${accountID} is not found`, 404);
+    }
+
+    const log = await BankingSystemRepository.log(accountID);
+
     return log;
   }
 }

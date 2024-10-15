@@ -8,13 +8,13 @@ import errorMiddleware from './middlewares/error.js';
 
 const app = express();
 
-const logMiddleware = (req, res, next) => {
-  console.log(
-    `Request Method: ${req.method} - URL: ${req.originalUrl} - Timestamp: ${new Date().toLocaleDateString()}`,
-  );
+// const logMiddleware = (req, res, next) => {
+//   console.log(
+//     `Request Method: ${req.method} - URL: ${req.originalUrl} - Timestamp: ${new Date().toLocaleDateString()}`,
+//   );
 
-  next();
-};
+//   next();
+// };
 
 app.use(
   cors({
@@ -28,11 +28,11 @@ app.use(
   }),
 );
 
-app.use(logger('combined', logger_format));
+app.use(logger(logger_format.MORGAN_FORMAT));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(logMiddleware);
+// app.use(logMiddleware);
 
 app.use(router);
 

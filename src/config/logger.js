@@ -1,3 +1,3 @@
 export default {
-	MORGAN_FORMAT: ':method :url :status :res[content-length] - :response-time ms',
+  MORGAN_FORMAT: '[:status] :method :url - :response-time ms',
 };

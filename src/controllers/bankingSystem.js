@@ -32,7 +32,7 @@ export class BankingSystemController {
       const amount = parseFloat(req.body.amount);
 
       if (!accountID) {
-        return next(new ErrorHandler(`sender ID is required`, 400));
+        return next(new ErrorHandler(`account ID is required`, 400));
       }
 
       if (!amount) {
@@ -53,13 +53,32 @@ export class BankingSystemController {
   }
 
   static async withdrawal(req, res, next) {
-    const withdrawal = await BankingSystemService.withdrawal();
-    res.json({
-      status: true,
-      statusCode: 200,
-      message: 'withdrawal successfully',
-      data: withdrawal,
-    });
+    try {
+      const accountID = req.params.id;
+      const amount = parseFloat(req.body.amount);
+
+      if (!accountID) {
+        return next(new ErrorHandler(`account ID is required`, 400));
+      }
+
+      if (!amount) {
+        return next(new ErrorHandler(`amount is required`, 400));
+      }
+
+      const withdrawal = await BankingSystemService.withdrawal(
+        accountID,
+        amount,
+      );
+
+      res.json({
+        status: true,
+        statusCode: 200,
+        message: 'withdrawal successfully',
+        data: withdrawal,
+      });
+    } catch (error) {
+      next(new ErrorHandler(error.message, error.statusCode));
+    }
   }
 
   static async transfer(req, res, next) {

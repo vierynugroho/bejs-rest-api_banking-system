@@ -32,7 +32,7 @@ export class BankingSystemService {
 
     const accountBalance = await BankingSystemRepository.getBalance(accountID);
 
-    const newAccountBalance = parseFloat(accountBalance) - amount;
+    const newAccountBalance = parseFloat(accountBalance) + amount;
 
     const accountDeposit = await BankingSystemRepository.updateBalance(
       accountID,
@@ -47,9 +47,37 @@ export class BankingSystemService {
     return trx;
   }
 
-  static async withdrawal() {
-    const withdrawal = await BankingSystemRepository.withdrawal();
-    return withdrawal;
+  static async withdrawal(accountID, amount) {
+    const account = await BankingSystemRepository.getAccount(accountID);
+
+    if (!account) {
+      throw new ErrorHandler(`account with ID: ${senderID} is not found`, 404);
+    }
+
+    const insufficient = await BankingSystemRepository.insufficientCheck(
+      accountID,
+      amount,
+    );
+
+    if (insufficient) {
+      throw new ErrorHandler(`account remaining balance is insufficient`, 400);
+    }
+
+    const accountBalance = await BankingSystemRepository.getBalance(accountID);
+
+    const newAccountBalance = parseFloat(accountBalance) - amount;
+
+    const accountWithdrawal = await BankingSystemRepository.updateBalance(
+      accountID,
+      newAccountBalance,
+    );
+
+    const trx = {
+      amount: amount,
+      currentAccountBalance: accountWithdrawal,
+    };
+
+    return trx;
   }
 
   static async transfer(senderID, receiverID, amount) {

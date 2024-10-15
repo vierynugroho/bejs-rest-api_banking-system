@@ -4,53 +4,51 @@ import logger from 'morgan';
 import cors from 'cors';
 import {} from 'dotenv/config';
 import router from './routes/index.js';
+import errorMiddleware from './middlewares/error.js';
 
 const app = express();
 
 const logMiddleware = (req, res, next) => {
-	console.log(`Request Method: ${req.method} - URL: ${req.originalUrl} - Timestamp: ${new Date().toLocaleDateString()}`);
+  console.log(
+    `Request Method: ${req.method} - URL: ${req.originalUrl} - Timestamp: ${new Date().toLocaleDateString()}`,
+  );
 
-	next();
+  next();
 };
 
 app.use(
-	cors({
-		origin: '*',
-		methods: 'GET, POST, PUT, DELETE, PATCH',
-		allowedHeaders: 'Content-Type, Authorization, Accept, Accept-Language, Accept-Encoding',
-		exposedHeaders: 'Content-Type, Authorization, Accept, Accept-Language, Accept-Encoding',
-		maxAge: 3600,
-	})
+  cors({
+    origin: '*',
+    methods: 'GET, POST, PUT, DELETE, PATCH',
+    allowedHeaders:
+      'Content-Type, Authorization, Accept, Accept-Language, Accept-Encoding',
+    exposedHeaders:
+      'Content-Type, Authorization, Accept, Accept-Language, Accept-Encoding',
+    maxAge: 3600,
+  }),
 );
 
 app.use(logger('combined', logger_format));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 
 app.use(logMiddleware);
 
 app.use(router);
 
 // error response handler
-app.use((err, req, res, next) => {
-	res.status(err.status || 500);
-	res.json({
-		status: false,
-		message: err.message,
-	});
-});
+app.use(errorMiddleware);
 
 //* 404 Response Handler
 app.use((req, res) => {
-	const url = req.url;
-	const method = req.method;
-	res.status(404).json({
-		status: false,
-		code: 404,
-		method,
-		url,
-		message: 'Not Found!',
-	});
+  const url = req.url;
+  const method = req.method;
+  res.status(404).json({
+    error: {
+      statusCode: 404,
+      message: `${method} - ${url} is not found!`,
+    },
+  });
 });
 
 export default app;

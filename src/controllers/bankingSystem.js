@@ -28,10 +28,10 @@ export class BankingSystemController {
 
   static async deposit(req, res, next) {
     try {
-      const account = req.params.id;
-      const amount = parseFloat(req.query.amount);
+      const accountID = req.params.id;
+      const amount = parseFloat(req.body.amount);
 
-      if (!account) {
+      if (!accountID) {
         return next(new ErrorHandler(`sender ID is required`, 400));
       }
 
@@ -39,17 +39,13 @@ export class BankingSystemController {
         return next(new ErrorHandler(`amount is required`, 400));
       }
 
-      const deposit = await BankingSystemService.deposit(
-        senderID,
-        receiverID,
-        amount,
-      );
+      const deposit = await BankingSystemService.deposit(accountID, amount);
 
       res.json({
         status: true,
         statusCode: 200,
         message: 'deposit successfully',
-        data: { currenBalance: deposit },
+        data: deposit,
       });
     } catch (error) {
       next(new ErrorHandler(error.message, error.statusCode));

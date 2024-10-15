@@ -14,7 +14,29 @@ export class BankingSystemService {
     return balance;
   }
 
-  static async deposit(senderID, receiverID, amount) {}
+  static async deposit(accountID, amount) {
+    const account = await BankingSystemRepository.getAccount(accountID);
+
+    if (!account) {
+      throw new ErrorHandler(`account with ID: ${senderID} is not found`, 404);
+    }
+
+    const accountBalance = await BankingSystemRepository.getBalance(accountID);
+
+    const newAccountBalance = parseFloat(accountBalance) - amount;
+
+    const accountDeposit = await BankingSystemRepository.updateBalance(
+      accountID,
+      newAccountBalance,
+    );
+
+    const trx = {
+      amount: amount,
+      currentAccountBalance: accountDeposit,
+    };
+
+    return trx;
+  }
 
   static async withdrawal() {
     const withdrawal = await BankingSystemRepository.withdrawal();

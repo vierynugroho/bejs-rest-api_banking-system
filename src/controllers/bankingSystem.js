@@ -64,9 +64,9 @@ export class BankingSystemController {
 
   static async transfer(req, res, next) {
     try {
-      const senderID = req.query.senderID;
-      const receiverID = req.query.receiverID;
-      const amount = parseFloat(req.query.amount);
+      const senderID = req.params.id;
+      const receiverID = req.body.receiverID;
+      const amount = parseFloat(req.body.amount);
 
       console.log(senderID, receiverID, amount);
 
